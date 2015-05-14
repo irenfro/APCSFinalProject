@@ -26,8 +26,7 @@ public class Main extends Application{
 
 		//TODO 1: add background
 		bkgrd = new ImageView("background.png");
-		// The Villain in Glasses has arrived! MWAHAHAHAHAHAHAHAHAHAHAHAHAHA!!!! XD
-		
+
 		
 		//TODO 2: add Flappy
 		ImageView flappy = new ImageView("flappy.png");
