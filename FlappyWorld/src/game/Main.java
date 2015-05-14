@@ -30,7 +30,8 @@ public class Main extends Application{
 		
 		
 		//TODO 2: add Flappy
-
+		ImageView flappy = new ImageView("flappy.png");
+		
 		
 		
 		//TODO 3: add Button
@@ -40,6 +41,7 @@ public class Main extends Application{
 		//Create a Group 
 		root = new Group( );
 		root.getChildren().add(bkgrd );
+		root.getChildren().add(flappy);
 		
 		//TODO 4: add action handler to the button
 		addActionEventHandler();
