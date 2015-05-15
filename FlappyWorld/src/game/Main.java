@@ -10,14 +10,14 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-
+import javafx.util.Duration
 
 public class Main extends Application{
 	
 	private Button button = null;
 	private Group root = null;
 	private ImageView bkgrd = null ;
-	private Node flappy = null;
+	private ImageView flappy = null;
 	
     private void addActionEventHandler(){
     	button.setOnAction(new EventHandler<ActionEvent>() {
@@ -86,3 +86,4 @@ public class Main extends Application{
 	}
 
 }
+
