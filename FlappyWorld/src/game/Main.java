@@ -10,7 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import javafx.util.Duration
+import javafx.util.Duration;
 
 public class Main extends Application{
 	
