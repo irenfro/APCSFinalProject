@@ -1,5 +1,8 @@
 package game;
 import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -12,32 +15,36 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-public class Main extends Application{
+public class Main extends Application {
 
 	private Button button = null;
 	private Group root = null;
 	private ImageView bkgrd = null ;
 	private ImageView flappy = null;
+	private Timeline timeline;
 
 	private void addActionEventHandler(){
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				//TODO: start the drop animation of the bird
-				TranslateTransition translateTransition = new TranslateTransition(Duration.millis(2000), flappy);
-				addMouseEventHandler();
-				translateTransition.setFromY(flappy.getTranslateY());
-				translateTransition.setToY(300);
-				translateTransition.setInterpolator(new Interpolator() {
-					protected double curve(double t) {
-						double factor = .98;
-						return factor * t * t + (1-factor)*t ;
-					}
-				});
-				translateTransition.play();
-
-			}
-		});
+				timeline = new Timeline();
+            	final double height = 56;
+            	final double duration = Math.sqrt(height/4.8);
+            	KeyValue kv = new KeyValue(flappy.translateYProperty(), 300, new Interpolator () {
+            		@Override
+            		protected double curve(double t) {
+            			double time = t * duration;
+            			double distance = 4.8 * time * time;
+            			double t2 = distance / height;
+            			return t2;
+            		}
+            	});
+            	final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
+            	timeline.getKeyFrames().add(kf);
+            	timeline.play();
+            	
+            }
+        });
 	}
 
 	private void addMouseEventHandler(){
@@ -45,6 +52,7 @@ public class Main extends Application{
             @Override
             public void handle(MouseEvent event) {
             	//To click the screen should lift bird 
+            	timeline.pause();
             	TranslateTransition tT = new TranslateTransition(new Duration(500), flappy);
             	tT.setFromY(flappy.getTranslateY());
 				tT.setToY(flappy.getTranslateY()-50);
@@ -82,6 +90,7 @@ public class Main extends Application{
 		addActionEventHandler();
 
 		//TODO 5: add mouse handler to the scene
+		addMouseEventHandler();
 
 
 		//Create scene and add to stage
@@ -96,4 +105,5 @@ public class Main extends Application{
 	}
 
 }
+
 
