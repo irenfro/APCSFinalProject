@@ -34,7 +34,7 @@ public class Main extends Application {
             		@Override
             		protected double curve(double t) {
             			double time = t * duration;
-            			double distance = 4.8 * time * time;
+            			double distance = 4.9 * time * time;
             			double t2 = distance / height;
             			return t2;
             		}
