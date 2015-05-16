@@ -24,10 +24,11 @@ public class Main extends Application {
 	private Timeline timeline;
 
 	private void addActionEventHandler(){
-		button.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				timeline = new Timeline();
+        button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	//TODO: start the drop animation of the bird
+            	final Timeline timeline = new Timeline();
             	final double height = 56;
             	final double duration = Math.sqrt(height/4.8);
             	KeyValue kv = new KeyValue(flappy.translateYProperty(), 300, new Interpolator () {
@@ -45,21 +46,31 @@ public class Main extends Application {
             	
             }
         });
-	}
-
-	private void addMouseEventHandler(){
-		root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
+    }
+    
+    private void addMouseEventHandler(){
+    	root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-            	//To click the screen should lift bird 
-            	timeline.pause();
-            	TranslateTransition tT = new TranslateTransition(new Duration(500), flappy);
-            	tT.setFromY(flappy.getTranslateY());
-				tT.setToY(flappy.getTranslateY()-50);
-				tT.play();
-				}
+            	final Timeline timeline = new Timeline();
+            	final double height = 56;
+            	final double duration = Math.sqrt(height/4.9);
+            	KeyValue kv = new KeyValue(flappy.translateYProperty(), -25, new Interpolator () {
+            		@Override
+            		protected double curve(double t) {
+            			double time = t * duration;
+            			double distance = -4.9 * time * time + 25 * time ;
+            			double t2 = distance / height;
+            			return t2;
+            		}
+            	});
+            	final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
+            	timeline.getKeyFrames().add(kf);
+            	timeline.play();
+            	
+            }
         });
-	}	
+    }	
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
