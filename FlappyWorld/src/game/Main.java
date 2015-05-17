@@ -30,7 +30,7 @@ public class Main extends Application {
             	//TODO: start the drop animation of the bird
             	final Timeline timeline = new Timeline();
             	final double height = 56;
-            	final double duration = Math.sqrt(height/4.8);
+            	final double duration = Math.sqrt(2*height/9.8);
             	KeyValue kv = new KeyValue(flappy.translateYProperty(), 300, new Interpolator () {
             		@Override
             		protected double curve(double t) {
@@ -53,21 +53,23 @@ public class Main extends Application {
             @Override
             public void handle(MouseEvent event) {
             	final Timeline timeline = new Timeline();
+            	final double v0 = -15;
+            	final double a = 9.8;
             	final double height = 56;
-            	final double duration = Math.sqrt(height/4.9);
-            	KeyValue kv = new KeyValue(flappy.translateYProperty(), -25, new Interpolator () {
+            	final double duration = ((-2*v0/a)+Math.sqrt(((4*v0*v0)/(a*a))+(8*height/a)))*0.5;
+            	KeyValue kv = new KeyValue(flappy.translateYProperty(), 300, new Interpolator () {
             		@Override
             		protected double curve(double t) {
             			double time = t * duration;
-            			double distance = -4.9 * time * time + 25 * time ;
+            			double distance = (v0*time) + (0.5*a*time*time);
             			double t2 = distance / height;
             			return t2;
             		}
-            	});
+            	}
+            	);
             	final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
             	timeline.getKeyFrames().add(kf);
             	timeline.play();
-            	
             }
         });
     }	
