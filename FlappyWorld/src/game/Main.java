@@ -3,7 +3,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,7 +20,6 @@ public class Main extends Application {
 	private Group root = null;
 	private ImageView bkgrd = null ;
 	private ImageView flappy = null;
-	private Timeline timeline;
 
 	private void addActionEventHandler(){
         button.setOnAction(new EventHandler<ActionEvent>() {
