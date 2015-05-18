@@ -55,7 +55,7 @@ public class PhysicsFlappy1Timeline extends Application {
 	            	duration = timeForDistAccel(max_y - start_y, yv, g);
 	            	timeline = new Timeline();
 	            	KeyValue kv = new KeyValue(flappy.translateYProperty(), range_y, interpolator);
-	            	KeyFrame kf = new KeyFrame(Duration.millis(duration * 500), kv);
+	            	KeyFrame kf = new KeyFrame(Duration.millis(duration * 250), kv);
 	            	timeline.getKeyFrames().add(kf);
 	            	timeline.play();            	
 	            }
@@ -82,7 +82,7 @@ public class PhysicsFlappy1Timeline extends Application {
 	            	duration += boostTime + timeForDistAccel(max_y - start_y - delta_d, vf, g);
 	            	timeline = new Timeline();
 	            	KeyValue kv = new KeyValue(flappy.translateYProperty(), range_y, interpolator);
-	            	KeyFrame kf = new KeyFrame(Duration.millis(duration * 500), kv);
+	            	KeyFrame kf = new KeyFrame(Duration.millis(duration * 250), kv);
 	            	timeline.getKeyFrames().add(kf);
 	            	timeline.play();
 	            }
@@ -91,10 +91,8 @@ public class PhysicsFlappy1Timeline extends Application {
 	    
 	    private void calculateBoostFactor() {
 	    	if(yv > 50) {
-	    		boostFactor = 100;
-	    	} else  if(yv < 50 && yv > 20){
 	    		boostFactor = 50;
-	    	} else {
+	    	 } else {
 	    		boostFactor = 25;
 	    	}
 	    }
