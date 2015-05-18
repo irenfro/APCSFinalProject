@@ -91,7 +91,7 @@ public class Main extends Application {
 
 		//TODO 1: add background
 		ImageView ground = movingGround(0);
-		bkgrd = new ImageView("background.png");
+		bkgrd = new ImageView("background2.png");
 		
 		//TODO 2: add Flappy
 		flappy = new ImageView("flappy.png");
