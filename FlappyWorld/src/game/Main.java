@@ -22,63 +22,77 @@ public class Main extends Application {
 	private ImageView flappy = null;
 
 	private void addActionEventHandler(){
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-            	//TODO: start the drop animation of the bird
-            	final Timeline timeline = new Timeline();
-            	final double height = 56;
-            	final double duration = Math.sqrt(2*height/9.8);
-            	KeyValue kv = new KeyValue(flappy.translateYProperty(), 300, new Interpolator () {
-            		@Override
-            		protected double curve(double t) {
-            			double time = t * duration;
-            			double distance = 4.9 * time * time;
-            			double t2 = distance / height;
-            			return t2;
-            		}
-            	});
-            	final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
-            	timeline.getKeyFrames().add(kf);
-            	timeline.play();
-            	
-            }
-        });
-    }
-    
-    private void addMouseEventHandler(){
-    	root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-            	final Timeline timeline = new Timeline();
-            	final double v0 = -15;
-            	final double a = 9.8;
-            	final double height = 56;
-            	final double duration = ((-2*v0/a)+Math.sqrt(((4*v0*v0)/(a*a))+(8*height/a)))*0.5;
-            	KeyValue kv = new KeyValue(flappy.translateYProperty(), 300, new Interpolator () {
-            		@Override
-            		protected double curve(double t) {
-            			double time = t * duration;
-            			double distance = (v0*time) + (0.5*a*time*time);
-            			double t2 = distance / height;
-            			return t2;
-            		}
-            	}
-            	);
-            	final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
-            	timeline.getKeyFrames().add(kf);
-            	timeline.play();
-            }
-        });
-    }	
+		button.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				//TODO: start the drop animation of the bird
+				final Timeline timeline = new Timeline();
+				final double height = 10;
+				final double a = 9.8;
+				final double duration = Math.sqrt(2*height/a);
+				KeyValue kv = new KeyValue(flappy.translateYProperty(), 290, new Interpolator () {
+					@Override
+					protected double curve(double t) {
+						double time = t * duration;
+						double distance = (0.5*a) * time * time;
+						double t2 = distance / height;
+						return t2;
+					}
+				});
+				final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
+				timeline.getKeyFrames().add(kf);
+				timeline.play();
+
+			}
+		});
+	}
+
+	private void addMouseEventHandler(){
+		root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				final Timeline timeline = new Timeline();
+				final double v0 = -5;
+				final double a = 9.8;
+				final double height = 10;
+				final double duration = ((-2*v0/a)+Math.sqrt(((4*v0*v0)/(a*a))+(8*height/a)))*0.5;
+				KeyValue kv = new KeyValue(flappy.translateYProperty(), 290, new Interpolator () {
+					@Override
+					protected double curve(double t) {
+						double time = t * duration;
+						double distance =  (v0*time) + (0.5*a*time*time);
+						double t2 = distance/height;
+						return t2;
+					}
+				}
+						);
+				final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
+				timeline.getKeyFrames().add(kf);
+				timeline.play();
+			}
+		});
+	}	
+
+	private ImageView movingGround(double x){
+		ImageView ground = new ImageView("ground.png");
+		ground.setLayoutX(0);
+		ground.setLayoutY(364);
+		ground.setFitWidth(800);
+		TranslateTransition transTransition = new TranslateTransition(new Duration(2500), ground);
+		transTransition.setToX(-400);
+		transTransition.setInterpolator(Interpolator.LINEAR);
+		transTransition.setCycleCount(Timeline.INDEFINITE);
+		transTransition.play();
+		return ground;
+	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
 		//TODO 1: add background
+		ImageView ground = movingGround(0);
 		bkgrd = new ImageView("background.png");
-
-
+		
 		//TODO 2: add Flappy
 		flappy = new ImageView("flappy.png");
 		flappy.preserveRatioProperty().set(true);
@@ -94,6 +108,7 @@ public class Main extends Application {
 		//Create a Group 
 		root = new Group( );
 		root.getChildren().add(bkgrd );
+		root.getChildren().add(ground );
 		root.getChildren().add(flappy);
 		root.getChildren().add(button);
 
