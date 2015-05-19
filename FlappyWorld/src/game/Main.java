@@ -3,6 +3,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,21 +22,40 @@ public class Main extends Application {
 	private ImageView bkgrd = null ;
 	private ImageView flappy = null;
 
+	static final double start_x = 150.0;
+	static final double max_y = 300; // end position
+	static final double start_y = 50; // starting y position
+	double range_y = max_y-start_y; // total change in y distance
+	private double y = start_y; //current position
+	private double v = 0.0; // current velocity
+	private double boostV = -10; // how much to boost with each click
+	private double g = 9.8;
+
+	private void boost(){
+		v = boostV;
+		y-=calcDist();
+	}
+	private double calcDist(){ // calculate distance to reach v=0 after boost
+		return (boostV*boostV)/(2*g);
+	}
+
+
 	private void addActionEventHandler(){
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				addMouseEventHandler();
+
 				//TODO: start the drop animation of the bird
 				final Timeline timeline = new Timeline();
-				final double height = 10;
-				final double a = 9.8;
-				final double duration = Math.sqrt(2*height/a);
-				KeyValue kv = new KeyValue(flappy.translateYProperty(), 290, new Interpolator () {
+				final double duration = Math.sqrt(2*range_y/g);
+				KeyValue kv = new KeyValue(flappy.translateYProperty(), max_y, new Interpolator () {
 					@Override
 					protected double curve(double t) {
-						double time = t * duration;
-						double distance = (0.5*a) * time * time;
-						double t2 = distance / height;
+						double time =  t * duration;
+						double y = ((0.5*g) * time * time);
+						//						System.out.println(y);
+						double t2 = y / range_y;
 						return t2;
 					}
 				});
@@ -52,22 +72,39 @@ public class Main extends Application {
 			@Override
 			public void handle(MouseEvent event) {
 				final Timeline timeline = new Timeline();
-				final double v0 = -5;
-				final double a = 9.8;
-				final double height = 10;
-				final double duration = ((-2*v0/a)+Math.sqrt(((4*v0*v0)/(a*a))+(8*height/a)))*0.5;
-				KeyValue kv = new KeyValue(flappy.translateYProperty(), 290, new Interpolator () {
-					@Override
-					protected double curve(double t) {
-						double time = t * duration;
-						double distance =  (v0*time) + (0.5*a*time*time);
-						double t2 = distance/height;
-						return t2;
-					}
-				}
-						);
-				final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
+				boost();
+				System.out.println(y);
+				range_y=max_y-y;
+				//				final double duration = ((-2*boostV/g)+Math.sqrt(((4*boostV*boostV)/(g*g))+(8*(range_y)/g)))*0.5;				
+				//				final double y0=calcDist()+range_y;
+
+				//				KeyValue kv = new KeyValue(flappy.translateYProperty(), max_y, new Interpolator () {
+				//					@Override
+				//					protected double curve(double t) {
+				//						double time = t * duration;
+				//						double y =  (boostV*time)+(0.5*g*time*time);
+				//						double t2 = y/y0;
+				//						return t2;
+				//					}
+				//				}
+				//						);
+				//				KeyValue kv1 = new KeyValue(flappy.translateYProperty(), 290, new Interpolator () {
+				//					@Override
+				//					protected double curve(double t) {
+				//						double time = t * duration;
+				//						double distance = (0.5*a) * time * time;
+				//						double t2 = distance / height;
+				//						return t2;
+				//					}
+				//				});
+
+				final double duration = -boostV/g;
+				KeyValue kv = new KeyValue(flappy.translateYProperty(), flappy.getTranslateY()-calcDist(), Interpolator.LINEAR);
+				final KeyFrame kf = new KeyFrame(Duration.millis(duration*1000), kv);
+				//				final KeyFrame kf1 = new KeyFrame(Duration.millis(duration * 1000), kv1);
 				timeline.getKeyFrames().add(kf);
+				//				timeline.getKeyFrames().add(kf1);
+
 				timeline.play();
 			}
 		});
@@ -92,12 +129,12 @@ public class Main extends Application {
 		//TODO 1: add background
 		ImageView ground = movingGround(0);
 		bkgrd = new ImageView("background2.png");
-		
+
 		//TODO 2: add Flappy
 		flappy = new ImageView("flappy.png");
 		flappy.preserveRatioProperty().set(true);
-		flappy.layoutXProperty().set(150);
-		flappy.layoutYProperty().set(50);
+		flappy.layoutXProperty().set(start_x);
+		flappy.layoutYProperty().set(start_y);
 
 
 		//TODO 3: add Button
@@ -116,7 +153,6 @@ public class Main extends Application {
 		addActionEventHandler();
 
 		//TODO 5: add mouse handler to the scene
-		addMouseEventHandler();
 
 
 		//Create scene and add to stage
