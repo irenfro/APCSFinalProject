@@ -21,48 +21,59 @@ public class Main extends Application {
 	private Group root = null;
 	private ImageView bkgrd = null ;
 	private ImageView flappy = null;
-	
-	private static double start_y=50;
-	private static double max_y=300;
-	private double range=max_y-start_y;
-	
-	private double g=300;
-	private double boostV=-100;
-	private double boostT=-boostV/g;
-	private double boostD=(boostV*boostT)+(0.5*g*boostT*boostT);
-	private Timeline timeline;
 
-	
-	private double calcTime(double dist, double v){
-		return (-v+Math.sqrt((v*v)+2*g*dist))/g;
+	static final double g = 300, boostV = -150, sceneWidth=400, sceneHeight=400;
+	static final double start_x = 150, start_y = 150; // starting y position
+	static final double max_y = sceneHeight*0.9-23; // end position
+	static double v, duration, range;
+	static Timeline timeline;
+	static Interpolator interpolator;
+	static boolean endGame;
+
+	private double calcTime(double distance, double velocity){
+		return ((-velocity+Math.sqrt(velocity*velocity+(2*g*distance)))/g);
+	}
+	private void checkLocation(){
+		if(flappy.getY()>=max_y){ // end game if hits bottom
+			endGame=true;
+		}
+	}
+	private void interpolator(){
+		interpolator = new Interpolator(){
+			@Override
+			protected double curve (double t){
+				checkLocation();
+				 if (flappy.getY()<=10){ //if hits top, go to free fall
+					range=max_y-flappy.getY();
+					v=0;
+					duration = calcTime(range,v);
+				}
+				double time = t * duration;
+				double distance = (v*time)+(0.5*g*time*time);	
+				
+				return distance/range;
+			}
+		};
 	}
 	private void addActionEventHandler(){
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				addMouseEventHandler();
-				//TODO: start the drop animation of the bird
+				checkLocation();
 				if(timeline!=null){
 					timeline.stop();
 				}
-				final double height = max_y-flappy.getY();
-				final double duration = calcTime(height,0);
-				timeline=new Timeline();
-				KeyValue kv = new KeyValue(flappy.yProperty(), max_y, new Interpolator () {
-					@Override
-					protected double curve(double t) {
-//						System.out.println(flappy.getY()+","+flappy.yProperty().get());
-						double time = t * duration;
-						double distance = (0.5*g) * time * time;
-						double t2 = distance / height;
-						if(flappy.getY()>=max_y){return 1;}
-						return t2;
-					}
-				});
-				final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
+				if(!endGame){
+				range = max_y-flappy.getY();
+				v=0;
+				duration = calcTime(range,v);
+				timeline = new Timeline();
+				KeyValue kv = new KeyValue(flappy.yProperty(),max_y, interpolator);
+				final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);	
 				timeline.getKeyFrames().add(kf);
 				timeline.play();
-
+				}
 			}
 		});
 	}
@@ -71,48 +82,29 @@ public class Main extends Application {
 		root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
+				checkLocation();
 				if(timeline!=null){
 					timeline.stop();
 				}
-				timeline=new Timeline();
-				KeyValue kv = new KeyValue(flappy.yProperty(), flappy.getY()+boostD, new Interpolator () {
-					@Override
-					protected double curve(double t) {
-						double time = t * boostT;
-						double distance =  (boostV*time) + (0.5*g*time*time);
-						double t2 = distance/boostD;
-						return t2;
-					}
-				}
-						);
-				final KeyFrame kf = new KeyFrame(Duration.millis(boostT * 1000), kv);
+				if(!endGame){
+				range = max_y-flappy.getY();
+				v=boostV;	
+				duration = calcTime(range,boostV);
+				timeline = new Timeline();
+				KeyValue kv = new KeyValue(flappy.yProperty(),max_y, interpolator);
+				final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);	
 				timeline.getKeyFrames().add(kf);
-				
-				final double height = max_y-flappy.getY();
-				final double duration = calcTime(height,0);
-				KeyValue kv1 = new KeyValue(flappy.yProperty(), max_y, new Interpolator () {
-					@Override
-					protected double curve(double t) {
-						double time = t * duration;
-						double distance = (0.5*g) * time * time;
-						double t2 = distance / height;
-						if(flappy.getY()>=max_y){return 1;}
-						return t2;
-					}
-				});
-				final KeyFrame kf1 = new KeyFrame(Duration.millis(duration * 1000), kv1);
-				timeline.getKeyFrames().add(kf1);
-
 				timeline.play();
+				}
 			}
 		});
-	}	
+	}
 
 	private ImageView movingGround(double x){
 		ImageView ground = new ImageView("ground.png");
 		ground.setLayoutX(0);
-		ground.setLayoutY(364);
-		ground.setFitWidth(800);
+		ground.setLayoutY(sceneHeight*0.9);
+		ground.setFitWidth(sceneWidth*2);
 		TranslateTransition transTransition = new TranslateTransition(new Duration(2500), ground);
 		transTransition.setToX(-400);
 		transTransition.setInterpolator(Interpolator.LINEAR);
@@ -127,34 +119,39 @@ public class Main extends Application {
 		//TODO 1: add background
 		ImageView ground = movingGround(0);
 		bkgrd = new ImageView("background2.png");
-		
+
 		//TODO 2: add Flappy
 		flappy = new ImageView("flappy.png");
 		flappy.preserveRatioProperty().set(true);
-		flappy.layoutXProperty().set(150);
-		flappy.layoutYProperty().set(start_y);
+		flappy.xProperty().set(start_x);
+		flappy.yProperty().set(start_y);
 
 
 		//TODO 3: add Button
+//		ImageView startGame = new ImageView("instructions.png");
 		button = new Button("Start");
-		button.layoutXProperty().set(150);
+//		button.setGraphic(startGame);
+//		button.setStyle("-fx-background-color:transparent");
+		button.layoutXProperty().set(start_x);
+//		button.layoutYProperty().set(225);
 
 
 		//Create a Group 
 		root = new Group( );
-		root.getChildren().add(bkgrd);
-		root.getChildren().add(ground);
+		root.getChildren().add(bkgrd );
+		root.getChildren().add(ground );
 		root.getChildren().add(flappy);
 		root.getChildren().add(button);
 
 		//TODO 4: add action handler to the button
 		addActionEventHandler();
-
+		interpolator();
+		
 		//TODO 5: add mouse handler to the scene
 
 
 		//Create scene and add to stage
-		Scene scene = new Scene(root, 400, 400);
+		Scene scene = new Scene(root, sceneWidth, sceneHeight);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
@@ -165,5 +162,3 @@ public class Main extends Application {
 	}
 
 }
-
-
