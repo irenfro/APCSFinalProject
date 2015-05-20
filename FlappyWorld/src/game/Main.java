@@ -23,23 +23,55 @@ public class Main extends Application {
 	private ImageView flappy = null;
 
 	static final double start_x = 150.0;
-	static final double max_y = 300; // end position
+	static final double max_y = 350; // end position
 	static final double start_y = 50; // starting y position
 	double range_y = max_y-start_y; // total change in y distance
-	private double y = start_y; //current position
-	private double v = 0.0; // current velocity
-	private double boostV = -10; // how much to boost with each click
-	private double g = 9.8;
 
-	private void boost(){
-		v = boostV;
-		y-=calcDist();
+	static private double g = 98;
+	static private double boostV = -10; // how much to boost with each click
+	static private double boostT=Math.abs(boostV/g);
+	static private double boostD=Math.abs((boostV*boostV)/(2*g));
+
+	static private Timeline timeline;
+	private Interpolator interpolator;
+	private double y0= start_y; //current position
+	private double y1=y0; //next position
+	private double v0 = 0.0; // current velocity
+	private double v1=0.0; //next velocity
+	private double t0=0.0; //current time
+	private double t1=0.0; //next time
+	private double duration = 0.0; //time to reach max_y
+//	
+//	private void boost(){
+//		v0 = boostV;
+//		y-=calcDist();
+//	}
+
+	private void interpolate(){
+		interpolator = new Interpolator(){
+			@Override
+			protected double curve (double t){
+			
+				t1=t-t0;
+				t0=t;
+				double time = t1 * duration;
+				y0=y0+(v0*time)+((0.5)*(g*time*time));
+				v0=v0+(g*time);
+				if(y0>=max_y){
+					v0=0;
+				}else if (y0<=10){
+					v0=g;
+				}
+				System.out.println(y0+","+v0);
+				return (y0-start_y)/range_y;
+			}
+		
+		};
 	}
-	private double calcDist(){ // calculate distance to reach v=0 after boost
-		return (boostV*boostV)/(2*g);
-	}
-
-
+    private static double calcTime(double dist, double v0) {
+    	return (Math.sqrt(v0*v0 + 2 * g * dist) + v0)/g;
+    }
+    
 	private void addActionEventHandler(){
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -47,18 +79,15 @@ public class Main extends Application {
 				addMouseEventHandler();
 
 				//TODO: start the drop animation of the bird
-				final Timeline timeline = new Timeline();
-				final double duration = Math.sqrt(2*range_y/g);
-				KeyValue kv = new KeyValue(flappy.translateYProperty(), max_y, new Interpolator () {
-					@Override
-					protected double curve(double t) {
-						double time =  t * duration;
-						double y = ((0.5*g) * time * time);
-						//						System.out.println(y);
-						double t2 = y / range_y;
-						return t2;
-					}
-				});
+            	if (timeline != null) {
+            		timeline.stop();
+            		t0 = 0.0;
+            		y0=flappy.getY();
+            		range_y=max_y-y0;
+            	}
+            	duration = calcTime(range_y,v0);
+            	timeline=new Timeline();
+            	KeyValue kv = new KeyValue(flappy.translateYProperty(), range_y, interpolator);
 				final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);
 				timeline.getKeyFrames().add(kf);
 				timeline.play();
@@ -71,40 +100,18 @@ public class Main extends Application {
 		root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				final Timeline timeline = new Timeline();
-				boost();
-				System.out.println(y);
-				range_y=max_y-y;
-				//				final double duration = ((-2*boostV/g)+Math.sqrt(((4*boostV*boostV)/(g*g))+(8*(range_y)/g)))*0.5;				
-				//				final double y0=calcDist()+range_y;
-
-				//				KeyValue kv = new KeyValue(flappy.translateYProperty(), max_y, new Interpolator () {
-				//					@Override
-				//					protected double curve(double t) {
-				//						double time = t * duration;
-				//						double y =  (boostV*time)+(0.5*g*time*time);
-				//						double t2 = y/y0;
-				//						return t2;
-				//					}
-				//				}
-				//						);
-				//				KeyValue kv1 = new KeyValue(flappy.translateYProperty(), 290, new Interpolator () {
-				//					@Override
-				//					protected double curve(double t) {
-				//						double time = t * duration;
-				//						double distance = (0.5*a) * time * time;
-				//						double t2 = distance / height;
-				//						return t2;
-				//					}
-				//				});
-
-				final double duration = -boostV/g;
-				KeyValue kv = new KeyValue(flappy.translateYProperty(), flappy.getTranslateY()-calcDist(), Interpolator.LINEAR);
+				if (timeline != null) {
+            		timeline.stop();
+            		t0 = 0.0;
+            		y0=flappy.getY();
+            		range_y=max_y-y0;
+            	}
+				duration += boostT;
+				v0=boostV;
+				timeline = new Timeline();
+				KeyValue kv = new KeyValue(flappy.translateYProperty(), range_y, interpolator);
 				final KeyFrame kf = new KeyFrame(Duration.millis(duration*1000), kv);
-				//				final KeyFrame kf1 = new KeyFrame(Duration.millis(duration * 1000), kv1);
 				timeline.getKeyFrames().add(kf);
-				//				timeline.getKeyFrames().add(kf1);
-
 				timeline.play();
 			}
 		});
@@ -151,7 +158,7 @@ public class Main extends Application {
 
 		//TODO 4: add action handler to the button
 		addActionEventHandler();
-
+		interpolate();
 		//TODO 5: add mouse handler to the scene
 
 
