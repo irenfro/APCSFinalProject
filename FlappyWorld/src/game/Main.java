@@ -55,29 +55,7 @@ public class Main extends Application {
 			}
 		};
 	}
-	private void addActionEventHandler(){
-		button.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				addMouseEventHandler();
-				checkLocation();
-				if(timeline!=null){
-					timeline.stop();
-				}
-				if(!endGame){
-				range = max_y-flappy.getY();
-				v=0;
-				duration = calcTime(range,v);
-				timeline = new Timeline();
-				KeyValue kv = new KeyValue(flappy.yProperty(),max_y, interpolator);
-				final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);	
-				timeline.getKeyFrames().add(kf);
-				timeline.play();
-				}
-			}
-		});
-	}
-
+	
 	private void addMouseEventHandler(){
 		root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
 			@Override
@@ -126,25 +104,14 @@ public class Main extends Application {
 		flappy.xProperty().set(start_x);
 		flappy.yProperty().set(start_y);
 
-
-		//TODO 3: add Button
-//		ImageView startGame = new ImageView("instructions.png");
-		button = new Button("Start");
-//		button.setGraphic(startGame);
-//		button.setStyle("-fx-background-color:transparent");
-		button.layoutXProperty().set(start_x);
-//		button.layoutYProperty().set(225);
-
-
 		//Create a Group 
 		root = new Group( );
 		root.getChildren().add(bkgrd );
 		root.getChildren().add(ground );
 		root.getChildren().add(flappy);
-		root.getChildren().add(button);
 
 		//TODO 4: add action handler to the button
-		addActionEventHandler();
+		addMouseEventHandler();
 		interpolator();
 		
 		//TODO 5: add mouse handler to the scene
@@ -162,3 +129,4 @@ public class Main extends Application {
 	}
 
 }
+
