@@ -59,7 +59,7 @@ public class Main extends Application {
 //				}
 				double time =  t * duration;
 				int distance = (int) ((v*time)+(0.5*g*time*time));	
-				System.out.println(flappy.getY());
+//				System.out.println(flappy.getY());
 				checkLocation();
 				return distance/range;
 			}
@@ -75,12 +75,10 @@ public class Main extends Application {
 				if(n==1){
 					moveGround(); 
 					root.getChildren().remove(clickRun);					
-					root.getChildren().add(instructions);
-					root.getChildren().add(getReady);
+					root.getChildren().addAll(instructions, getReady);
 				}
 				else{
-					root.getChildren().remove(instructions);
-					root.getChildren().remove(getReady);
+					root.getChildren().removeAll(instructions,getReady);
 					if(!endGame){
 						if(timeline!=null){
 							timeline.stop();
@@ -147,12 +145,8 @@ public class Main extends Application {
 
 		//Create a Group 
 		root = new Group( );
-		root.getChildren().add(bkgrd );
-		root.getChildren().add(ground );
-		root.getChildren().add(flappy);
-		root.getChildren().add(clickRun);
+		root.getChildren().addAll(bkgrd, ground, flappy, clickRun);
 
-		System.out.println(max_y);
 		//TODO 4: add action handler to the button
 		addMouseEventHandler();
 		interpolator();
