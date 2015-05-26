@@ -41,9 +41,6 @@ public class Obstacle {
 		transTransition.setToX(-sceneWidth - 75);
 		transTransition.setInterpolator(Interpolator.LINEAR);
 		transTransition.setCycleCount(Timeline.INDEFINITE);
-		
-		TransTransition.play();
-		transTransition.play();
 
 
 
@@ -71,6 +68,11 @@ public class Obstacle {
 	
 	public double getY2() {
 		return top.layoutYProperty().doubleValue();// + top.getTranslateY() + top.yProperty().doubleValue();
+	}
+	
+	public void play(){
+		TransTransition.play();
+		transTransition.play();
 	}
 	
 	public void stop() {
