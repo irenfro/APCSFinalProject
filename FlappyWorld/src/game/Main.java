@@ -5,153 +5,148 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
-//import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-//import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class Main extends Application {
 
-//	private Button button = null;
-	static private Group root = null;
-	static private ImageView bkgrd = null ;
-	static private ImageView flappy = null;
-	static private ImageView ground = null;
-	static private ImageView clickRun = null;
-	static private ImageView instructions = null;
-	static private ImageView getReady = null;
-	static private ImageView gameOver=null;
+	private Group root = null;
+	private ImageView bkgrd = null ;
+	private ImageView flappy = null;
+	private Ground ground = null;
 
-	static final double g = 300, boostV = -150, sceneWidth=400, sceneHeight=400;
+	private boolean click = false;
+	private Obstacle pipe = new Obstacle("/obstacle_bottom.png", "/obstacle_top.png");;
+	private String url = getClass().getResource("/flappy.png").toString();
+
+	static double g = 300;
+	static final double boostV = -150;
+	static final double sceneWidth=400;
+	static final double sceneHeight=400;
 	static final double start_x = 150, start_y = 150; // starting y position
 	static final double max_y = sceneHeight*0.9-23; // end position
 	static double v, duration, range;
-	static TranslateTransition movingGround;
+	
 	static Timeline timeline;
+	static TranslateTransition transTransition;
 	static Interpolator interpolator;
+	
 	static boolean endGame;
 
 	private double calcTime(double distance, double velocity){
 		return ((-velocity+Math.sqrt(velocity*velocity+(2*g*distance)))/g);
 	}
 	private void checkLocation(){
-		double threshold=5;
-		if(flappy.getY()>=max_y-threshold){ // end game if hits bottom 
+		if(flappy.getY()>=max_y){ // end game if hits bottom
 			endGame=true;
-			movingGround.stop();
-			timeline.stop();
-			root.getChildren().add(gameOver);
 		}
 	}
 	private void interpolator(){
 		interpolator = new Interpolator(){
 			@Override
 			protected double curve (double t){
-//				if (flappy.getY()<=10){ //if hits top, go to free fall
-//					range=max_y-flappy.getY();
-//					v=0;
-//					duration = calcTime(range,v);
-//				}
-				double time =  t * duration;
-				int distance = (int) ((v*time)+(0.5*g*time*time));	
-//				System.out.println(flappy.getY());
 				checkLocation();
+				
+				if (flappy.getY()<=10 && endGame){ //if hits top, go to free fall
+					range=max_y-flappy.getY();
+					v=0;
+					duration = calcTime(range,v);
+				}
+				if(endGame) {
+					animationStop();
+				}
+				double time = t * duration;
+				double distance = (v*time)+(0.5*g*time*time);	
+				checkCollision();
+				print();
 				return distance/range;
 			}
 		};
 	}
-
+	
+	public void animationStop() {
+		try {
+			timeline.stop();
+			ground.stop();
+			pipe.stop();
+		} catch (Exception e) {
+			
+		}
+	}
+	
+	public void print() {
+		double flappyY = (flappy.yProperty().doubleValue() + flappy.getTranslateY());
+		double flappyX = (flappy.xProperty().doubleValue() + flappy.getTranslateX());
+		System.out.println("flappy Y: " + flappyY);
+		System.out.println("pipe Y: " + pipe.getY1());
+		System.out.println("flappy X: " + flappyX);
+		System.out.println("pipe X: " + pipe.getX1());
+		System.out.println("flappyY: " + flappyY);
+		System.out.println("pipeY: " + pipe.getY2());
+		System.out.println("flappyX: " + flappyX);
+		System.out.println("pipeX: " + pipe.getX2());
+		
+		
+	}
+	
 	private void addMouseEventHandler(){
 		root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
-			int n=0;
 			@Override
 			public void handle(MouseEvent event) {
-				n++;
-				if(n==1){
-					moveGround(); 
-					root.getChildren().remove(clickRun);					
-					root.getChildren().addAll(instructions, getReady);
+				if(timeline!=null){
+					timeline.stop();
 				}
-				else{
-					root.getChildren().removeAll(instructions,getReady);
-					if(!endGame){
-						if(timeline!=null){
-							timeline.stop();
-						}
-						range = max_y-flappy.getY();
-						v=boostV;	
-						duration = calcTime(range,boostV);
-						timeline = new Timeline();
-						KeyValue kv = new KeyValue(flappy.yProperty(),max_y, interpolator);
-						final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);	
-						timeline.getKeyFrames().add(kf);
-//						checkLocation();
-						timeline.play();
-					}
+				if(!endGame){
+				range = max_y-flappy.getY();
+				v=boostV;	
+				duration = calcTime(range,boostV);
+				timeline = new Timeline();
+				KeyValue kv = new KeyValue(flappy.yProperty(),max_y, interpolator);
+				final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);	
+				timeline.getKeyFrames().add(kf);
+				timeline.play();
 				}
 			}
 		});
 	}
 
-	private ImageView moveGround(){
-		movingGround = new TranslateTransition(new Duration(2000), ground);
-		movingGround.setToX(-sceneWidth);
-		movingGround.setInterpolator(Interpolator.LINEAR);
-		movingGround.setCycleCount(Timeline.INDEFINITE);
-		movingGround.play();
-		return ground;
-	}
-
-	//	private ImageView moveObstacles(){
-	//		
-	//	}
-
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
 		//TODO 1: add background
-		ground = new ImageView("ground.png");
-		ground.setLayoutX(0);
-		ground.setLayoutY(sceneHeight*0.9);
-		ground.setFitWidth(sceneWidth*2);
-
+		Ground ground = new Ground("/ground.png");
+		ground.movingGround(sceneHeight, sceneWidth);
 		bkgrd = new ImageView("background2.png");
 
 		//TODO 2: add Flappy
-		flappy = new ImageView("flappy.png");
+		flappy = new ImageView(url);
 		flappy.preserveRatioProperty().set(true);
 		flappy.xProperty().set(start_x);
 		flappy.yProperty().set(start_y);
-
-
-		//initial displays
-		clickRun= new ImageView("clickrun.png");
-		clickRun.setLayoutX(sceneWidth/6);
-		clickRun.setLayoutY(sceneHeight/2);
-		getReady = new ImageView("getready.png");
-		getReady.setLayoutX(sceneWidth/4);
-		getReady.setLayoutY(sceneHeight/6);
-		instructions = new ImageView("instructions.png");
-		instructions.setLayoutX(sceneWidth/3.5);
-		instructions.setLayoutY(sceneHeight/2);
-		gameOver = new ImageView("gameover.png");
-		gameOver.setLayoutX(sceneWidth/4);
-		gameOver.setLayoutY(sceneHeight/4);
+		
 
 		//Create a Group 
 		root = new Group( );
-		root.getChildren().addAll(bkgrd, ground, flappy, clickRun);
-
-		//TODO 4: add action handler to the button
-		addMouseEventHandler();
-		interpolator();
+		root.getChildren().add(bkgrd );
+		root.getChildren().add(ground.getImageView() );
+		root.getChildren().add(pipe.getImageView1());
+		root.getChildren().add(pipe.getImageView2());
+		root.getChildren().add(flappy);
+		
 
 		//TODO 5: add mouse handler to the scene
+		addMouseEventHandler();
+		interpolator();
+		pipe.movingGround(sceneHeight, sceneWidth);
+		
+		
 
 		//Create scene and add to stage
 		Scene scene = new Scene(root, sceneWidth, sceneHeight);
@@ -159,10 +154,30 @@ public class Main extends Application {
 		primaryStage.show();
 
 	}
+	
+	public void checkCollision() {
+		double flappyY = (flappy.yProperty().doubleValue() + flappy.getTranslateY());
+		double flappyX = (flappy.xProperty().doubleValue() + flappy.getTranslateX());
+		if(flappyY >= pipe.getY1() && flappyX >= pipe.getX1()) {
+			System.out.println("flappy Y: " + flappyY);
+			System.out.println("pipe Y: " + pipe.getY1());
+			System.out.println("flappy X: " + flappyX);
+			System.out.println("pipe X: " + pipe.getX1());
+			endGame = true;
+		} else if(flappyY <= pipe.getY2() && flappyX >= pipe.getX2()) {
+			System.out.println("flappyY: " + flappyY);
+			System.out.println("pipeY: " + pipe.getY2());
+			System.out.println("flappyX: " + flappyX);
+			System.out.println("pipeX: " + pipe.getX2());
+			endGame = true;
+		}
+		System.out.println(endGame);
+	}
 
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
 
 }
+
 
