@@ -16,6 +16,9 @@ public class Obstacle {
 	private int i = 0;
 	private TranslateTransition transTransition;
 	private TranslateTransition TransTransition;
+	private double sceneHeight;
+	private double sceneWidth;
+	private boolean bound = true;
 
 	
 	public Obstacle(String n1, String n2) {
@@ -27,6 +30,8 @@ public class Obstacle {
 	}
 	
 	public void movingGround(double sceneHeight, double sceneWidth){
+		this.sceneHeight = sceneHeight;
+		this.sceneWidth = sceneWidth;
 		this.bottom.setLayoutX(425);
 		this.bottom.setLayoutY(sceneHeight*0.9 - (100 + heights[i % 3]));
 		i++;
@@ -35,14 +40,31 @@ public class Obstacle {
 		transTransition = new TranslateTransition(new Duration(2500), this.bottom);
 		TransTransition  = new TranslateTransition(new Duration(2500), this.top);
 		TransTransition.setToX(-sceneWidth - 75);
-		TransTransition.setInterpolator(Interpolator.LINEAR);
+		TransTransition.setInterpolator(new Interpolator() {
+			@Override
+			protected double curve(double t) {
+				if(t == 1) {
+					bound = true;
+					random();
+				}
+				if(t >= .7 && bound) {
+					bound = false;
+					Main.score += 1;
+					System.out.println(Main.score);
+				}
+				return t;
+			}
+		});
 		TransTransition.setCycleCount(Timeline.INDEFINITE);
-		
 		transTransition.setToX(-sceneWidth - 75);
 		transTransition.setInterpolator(Interpolator.LINEAR);
 		transTransition.setCycleCount(Timeline.INDEFINITE);
-
-
+	}
+	
+	public void random() {
+		this.bottom.setLayoutY(sceneHeight*0.9 - (100 + ((int) Math.random() * 200)));
+		i++;
+		this.top.setLayoutY(bottom.getLayoutY() - 450);
 
 	}
 	
@@ -82,3 +104,4 @@ public class Obstacle {
 	
 	
 }
+
