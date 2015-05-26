@@ -33,8 +33,7 @@ public class Obstacle {
 		this.sceneHeight = sceneHeight;
 		this.sceneWidth = sceneWidth;
 		this.bottom.setLayoutX(425);
-		this.bottom.setLayoutY(sceneHeight*0.9 - (100 + heights[i % 3]));
-		i++;
+		this.bottom.setLayoutY(sceneHeight*0.9 - 100);
 		this.top.setLayoutX(425);
 		this.top.setLayoutY(bottom.getLayoutY() - 450);
 		transTransition = new TranslateTransition(new Duration(2500), this.bottom);
@@ -50,7 +49,6 @@ public class Obstacle {
 				if(t >= .7 && bound) {
 					bound = false;
 					Main.score += 1;
-					System.out.println(Main.score);
 				}
 				return t;
 			}

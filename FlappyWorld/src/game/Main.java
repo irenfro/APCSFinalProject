@@ -5,13 +5,18 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
+import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -25,11 +30,13 @@ public class Main extends Application {
 	private ImageView getReady = new ImageView("getready.png");
 	private ImageView gameOver = new ImageView("gameover.png");
 
+
 	private Ground ground = null;
 	private Obstacle pipe = new Obstacle("/obstacle_bottom.png", "/obstacle_top.png");
 	private String url = getClass().getResource("/flappy.png").toString();
 
 	protected static int score = 0;
+	private int i = 0;
 	
 	static double g = 300;
 	static final double boostV = -150;
@@ -53,15 +60,34 @@ public class Main extends Application {
 		if(flappy.getY()>=max_y-threshold || flappy.intersects(pipe.getX1(), pipe.getY1(), 52, 320) 
 				|| flappy.intersects(pipe.getX2(), pipe.getY2(), 52, 320) ){ // end game when hits bottom or obstacle
 			endGame=true;
-			System.out.println("die");
 
 		}
 	}
+	
 	private void interpolator(){
 		interpolator = new Interpolator(){
 			@Override
 			protected double curve (double t){
 				checkLocation();
+				
+				Text text = new Text(Integer.toString(score));
+				text.setLayoutX(20);
+				text.setLayoutY(50);
+			    text.setFont(Font.font ("Verdana", 36));
+			    Rectangle rect = new Rectangle();
+			    rect.setLayoutX(20);
+			    rect.setLayoutY(20);
+			    rect.setWidth(23);
+			    rect.setHeight(35);
+			    rect.fillProperty().set(Color.rgb(128, 185, 200));
+
+				if(i > 0) {
+					root.getChildren().remove(text);
+					root.getChildren().remove(rect);
+					root.getChildren().add(rect);
+				}
+				root.getChildren().add(text);
+				i++;
 				if (flappy.getY()<=10 && endGame){ //if hits top, go to free fall
 					range=max_y-flappy.getY();
 					v=0;
@@ -116,10 +142,11 @@ public class Main extends Application {
 			}
 		});
 	}
+	
+	
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		System.out.println(max_y);
 		//TODO 1: add background
 		ground = new Ground("/ground.png");
 		ground.movingGround(sceneHeight, sceneWidth);
@@ -132,6 +159,8 @@ public class Main extends Application {
 		instruct.setLayoutY(sceneHeight/2);
 		gameOver.setLayoutX(sceneWidth/5);
 		gameOver.setLayoutY(sceneHeight/5);
+	  
+	    
 
 		//TODO 2: add Flappy
 		flappy = new ImageView(url);
