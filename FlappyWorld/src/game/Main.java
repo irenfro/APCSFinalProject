@@ -26,10 +26,11 @@ public class Main extends Application {
 	private ImageView gameOver = new ImageView("gameover.png");
 
 	private Ground ground = null;
-	private boolean click = false;
 	private Obstacle pipe = new Obstacle("/obstacle_bottom.png", "/obstacle_top.png");
 	private String url = getClass().getResource("/flappy.png").toString();
 
+	protected static int score = 0;
+	
 	static double g = 300;
 	static final double boostV = -150;
 	static final double sceneWidth=400;
@@ -61,7 +62,6 @@ public class Main extends Application {
 			@Override
 			protected double curve (double t){
 				checkLocation();
-
 				if (flappy.getY()<=10 && endGame){ //if hits top, go to free fall
 					range=max_y-flappy.getY();
 					v=0;
@@ -72,36 +72,18 @@ public class Main extends Application {
 				}
 				double time = t * duration;
 				double distance = (v*time)+(0.5*g*time*time);	
-				//				checkCollision();
-				print();
 				return distance/range;
 			}
 		};
 	}
 
 	public void animationStop() {
-		try {
 			timeline.stop();
 			ground.stop();
 			pipe.stop();
 			root.getChildren().add(gameOver);
-		} catch (Exception e) {
-
-		}
 	}
 
-	public void print() {
-		double flappyY = (flappy.yProperty().doubleValue() + flappy.getTranslateY());
-		double flappyX = (flappy.xProperty().doubleValue() + flappy.getTranslateX());
-		System.out.println("flappy Y: " + flappyY);
-		System.out.println("pipe Y: " + pipe.getY1());
-		System.out.println("flappy X: " + flappyX);
-		System.out.println("pipe X: " + pipe.getX1());
-		System.out.println("flappyY: " + flappyY);
-		System.out.println("pipeY: " + pipe.getY2());
-		System.out.println("flappyX: " + flappyX);
-		System.out.println("pipeX: " + pipe.getX2());
-	}
 
 	private void addMouseEventHandler(){
 		root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
@@ -176,32 +158,11 @@ public class Main extends Application {
 
 	}
 
-	//	public void checkCollision() {
-	//		double flappyY = (flappy.yProperty().doubleValue() + flappy.getTranslateY());
-	//		double flappyX = (flappy.xProperty().doubleValue() + flappy.getTranslateX());
-	//		if(flappyY >= pipe.getY1() && flappyX >= pipe.getX1()) {
-	//			System.out.println("flappy Y: " + flappyY);
-	//			System.out.println("pipe Y: " + pipe.getY1());
-	//			System.out.println("flappy X: " + flappyX);
-	//			System.out.println("pipe X: " + pipe.getX1());
-	//			endGame = true;
-	//		} else if(flappyY <= pipe.getY2() && flappyX >= pipe.getX2()) {
-	//			System.out.println("flappyY: " + flappyY);
-	//			System.out.println("pipeY: " + pipe.getY2());
-	//			System.out.println("flappyX: " + flappyX);
-	//			System.out.println("pipeX: " + pipe.getX2());
-	//			endGame = true;
-	//		}
-
-	//		if(flappy.intersects(pipe.getX1(), pipe.getY1(), 52, 320) || flappy.intersects(pipe.getX2(), pipe.getY2(), 52, 320) ){
-	//			System.out.println("die");
-	//		}
-	//	}
-
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
 
 }
+
 
 
