@@ -18,16 +18,19 @@ public class Ground {
 	}
 	
 	public void movingGround(double sceneHeight, double sceneWidth){
-		transTransition = new TranslateTransition(new Duration(2500), this.ground);
+		transTransition = new TranslateTransition(new Duration(2000), this.ground);
 		this.ground.setLayoutX(0);
 		this.ground.setLayoutY(sceneHeight*0.9);
 		this.ground.setFitWidth(sceneWidth*2);
 		transTransition.setToX(-sceneHeight);
 		transTransition.setInterpolator(Interpolator.LINEAR);
 		transTransition.setCycleCount(Timeline.INDEFINITE);
-		transTransition.play();
+		
 	}
 	
+	public void play(){
+		transTransition.play();
+	}
 	public ImageView getImageView() {
 		return this.ground;
 	}
