@@ -20,7 +20,13 @@ public class Main extends Application {
 	private Group root = null;
 	private ImageView bkgrd = null ;
 	private ImageView flappy = null;
+	private ImageView clickRun = new ImageView("clickrun.png");
+	private ImageView instruct = new ImageView("instructions.png");
+	private ImageView getReady = new ImageView("getready.png");
+	private ImageView gameOver = new ImageView("gameover.png");
+
 	private Ground ground = null;
+
 
 	private boolean click = false;
 	private Obstacle pipe = new Obstacle("/obstacle_bottom.png", "/obstacle_top.png");
@@ -64,6 +70,7 @@ public class Main extends Application {
 				}
 				if(endGame) {
 					animationStop();
+					root.getChildren().add(gameOver);
 				}
 				double time = t * duration;
 				double distance = (v*time)+(0.5*g*time*time);	
@@ -101,20 +108,29 @@ public class Main extends Application {
 
 	private void addMouseEventHandler(){
 		root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
+			int n=0;
 			@Override
 			public void handle(MouseEvent event) {
-				if(timeline!=null){
-					timeline.stop();
+				n++;
+				if (n==1){
+					root.getChildren().remove(clickRun);
+					root.getChildren().addAll(instruct,getReady);
 				}
-				if(!endGame){
-					range = max_y-flappy.getY();
-					v=boostV;	
-					duration = calcTime(range,boostV);
-					timeline = new Timeline();
-					KeyValue kv = new KeyValue(flappy.yProperty(),max_y, interpolator);
-					final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);	
-					timeline.getKeyFrames().add(kf);
-					timeline.play();
+				else{
+					root.getChildren().removeAll(instruct,getReady);
+					if(timeline!=null){
+						timeline.stop();
+					}
+					if(!endGame){
+						range = max_y-flappy.getY();
+						v=boostV;	
+						duration = calcTime(range,boostV);
+						timeline = new Timeline();
+						KeyValue kv = new KeyValue(flappy.yProperty(),max_y, interpolator);
+						final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);	
+						timeline.getKeyFrames().add(kf);
+						timeline.play();
+					}
 				}
 			}
 		});
@@ -127,7 +143,15 @@ public class Main extends Application {
 		Ground ground = new Ground("/ground.png");
 		ground.movingGround(sceneHeight, sceneWidth);
 		bkgrd = new ImageView("background2.png");
-
+		clickRun.setLayoutX(sceneWidth/5);
+		clickRun.setLayoutY(sceneHeight/5);
+		getReady.setLayoutX(sceneWidth/5);
+		getReady.setLayoutY(sceneHeight/5);
+		instruct.setLayoutX(sceneWidth/5);
+		instruct.setLayoutY(sceneHeight/2);
+		gameOver.setLayoutX(sceneWidth/5);
+		gameOver.setLayoutY(sceneHeight/5);
+		
 		//TODO 2: add Flappy
 		flappy = new ImageView(url);
 		flappy.preserveRatioProperty().set(true);
@@ -142,7 +166,7 @@ public class Main extends Application {
 		root.getChildren().add(pipe.getImageView1());
 		root.getChildren().add(pipe.getImageView2());
 		root.getChildren().add(flappy);
-
+		root.getChildren().add(clickRun);
 
 		//TODO 5: add mouse handler to the scene
 		addMouseEventHandler();
@@ -175,9 +199,9 @@ public class Main extends Application {
 		//			endGame = true;
 		//		}
 
-//		if(flappy.intersects(pipe.getX1(), pipe.getY1(), 52, 320) || flappy.intersects(pipe.getX2(), pipe.getY2(), 52, 320) ){
-//			System.out.println("die");
-//		}
+		//		if(flappy.intersects(pipe.getX1(), pipe.getY1(), 52, 320) || flappy.intersects(pipe.getX2(), pipe.getY2(), 52, 320) ){
+		//			System.out.println("die");
+		//		}
 	}
 
 	public static void main(String[] args) {
