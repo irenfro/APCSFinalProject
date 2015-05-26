@@ -77,7 +77,13 @@ public class Main extends Application {
 			    Rectangle rect = new Rectangle();
 			    rect.setLayoutX(20);
 			    rect.setLayoutY(20);
-			    rect.setWidth(23);
+			    if(score >= 10 && score < 100) {
+			    	rect.setWidth(50);
+			    } else if(score >= 100) {
+			    	rect.setWidth(100);
+			    } else {
+				    rect.setWidth(23);
+			    }
 			    rect.setHeight(35);
 			    rect.fillProperty().set(Color.rgb(128, 185, 200));
 
