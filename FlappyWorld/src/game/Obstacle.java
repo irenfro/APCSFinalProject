@@ -46,7 +46,8 @@ public class Obstacle {
 					bound = true;
 					random();
 				}
-				if(t >= .7 && bound) {
+				System.out.println(t);
+				if(t >= .6 && bound && t != 1) {
 					bound = false;
 					Main.score += 1;
 				}
@@ -65,7 +66,6 @@ public class Obstacle {
 			a *= -1;
 		}
 		clicks++;
-		System.out.println(bottom.getLayoutY());
 		this.top.setLayoutY(bottom.getLayoutY() - 450);
 
 	}
