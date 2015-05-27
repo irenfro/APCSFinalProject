@@ -1,20 +1,20 @@
 package game;
+import java.io.File;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
-import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -22,10 +22,12 @@ import javafx.util.Duration;
 
 public class Main extends Application {
 
-	private Group root = null;
+	protected static Group root = null;
 	private ImageView bkgrd = null ;
 	private ImageView flappy = null;
+	private Button button;
 	private Text text = null;
+	private static String[] Args;
 	private Group scores;
 	private ImageView clickRun = new ImageView("clickrun.png");
 	private ImageView instruct = new ImageView("instructions.png");
@@ -100,6 +102,41 @@ public class Main extends Application {
 			ground.stop();
 			pipe.stop();
 			root.getChildren().add(gameOver);
+			button = new Button("Restart");
+			button.setLayoutX(20);
+			button.setLayoutY(20);
+			root.getChildren().add(button);
+			addActionEventHandler();
+	}
+	
+	public void addActionEventHandler() {
+		 button.setOnAction(new EventHandler<ActionEvent>() {
+	            @Override
+	            public void handle(ActionEvent event) {
+	                try {
+						restartApplication();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	            }
+	        });
+
+	}
+	
+	public void restartApplication() throws IOException {
+		StringBuilder command = new StringBuilder();
+        command.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
+        for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
+            command.append(jvmArg + " ");
+        }
+        command.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
+        command.append(Main.class.getName()).append(" ");
+        for (String arg : Args) {
+            command.append(arg).append(" ");
+        }
+        Runtime.getRuntime().exec(command.toString());
+        System.exit(0);
 	}
 
 
@@ -184,8 +221,12 @@ public class Main extends Application {
 	}
 
 	public static void main(String[] args) {
+		Args = args;
 		Application.launch(args);
 	}
+	
+	
+
 
 }
 
