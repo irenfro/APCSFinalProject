@@ -84,7 +84,7 @@ public class Main extends Application {
 				text = new Text(Integer.toString(score));
 				text.setLayoutX(20);
 				text.setLayoutY(50);
-			    text.setFont(Font.font ("Verdana", 36));
+			    text.setFont(Font.font("Verdana", 36));
 			    
 			    root.getChildren().remove(scores);
 			    scores.getChildren().clear();
@@ -97,6 +97,7 @@ public class Main extends Application {
 				}
 				if(endGame) {
 					animationStop();
+					flappyFly(0, Interpolator.LINEAR); 
 				}
 				double time = t * duration;
 				double distance = (v*time)+(0.5*g*time*time);	
@@ -146,40 +147,46 @@ public class Main extends Application {
         Runtime.getRuntime().exec(command.toString());
         System.exit(0);
 	}
-
-
-	private void addMouseEventHandler(){
-		root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
-			int n=0;
-			@Override
-			public void handle(MouseEvent event) {
-				n++;
-				if (n==1){
-					root.getChildren().remove(clickRun);
-					root.getChildren().addAll(instruct,getReady);
-				}
-				else{
-					root.getChildren().removeAll(instruct,getReady);
-					if(timeline!=null){
-						timeline.stop();
-					}
-					if(!endGame){
-						player.play();
-						ground.play();
-						pipe.play();
-						range = max_y-flappy.getY();
-						v=boostV;	
-						duration = calcTime(range,boostV);
-						timeline = new Timeline();
-						KeyValue kv = new KeyValue(flappy.yProperty(),max_y, interpolator);
-						final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);	
-						timeline.getKeyFrames().add(kf);
-						timeline.play();
-					}
-				}
+	
+	public void flappyFly(double velocity, Interpolator i){
+					range = max_y-flappy.getY();
+					v=velocity;	
+					duration = calcTime(range,v);
+					timeline = new Timeline();
+					KeyValue kv = new KeyValue(flappy.yProperty(),max_y,i);
+					final KeyFrame kf = new KeyFrame(Duration.millis(duration * 1000), kv);	
+					timeline.getKeyFrames().add(kf);
+					timeline.play();
 			}
-		});
-	}
+	
+	private void addMouseEventHandler(){
+				root.onMouseClickedProperty().set(new EventHandler<MouseEvent>() {
+					int n=0;
+					@Override
+					public void handle(MouseEvent event) {
+						n++;
+						if (n==1){
+							root.getChildren().remove(clickRun);
+							root.getChildren().addAll(instruct,getReady);
+							ground.play();
+						}
+						else{
+							root.getChildren().removeAll(instruct,getReady);
+							if(timeline!=null){
+								timeline.stop();
+							}
+							if(!endGame){
+								player.play();
+								pipe.play();
+								flappyFly(boostV, interpolator);
+							}
+						}
+					}
+				});
+			}
+
+
+	
 	
 	
 
@@ -217,8 +224,9 @@ public class Main extends Application {
 		//Create a Group 
 		root = new Group( );
 		scores = new Group();
-		root.getChildren().addAll(bkgrd, flappy, clickRun);
+		root.getChildren().addAll(bkgrd, clickRun);
 		root.getChildren().addAll(ground.getImageView(), pipe.getImageView1(), pipe.getImageView2());
+		root.getChildren().add(flappy);
 		scores.getChildren().add(text);
 		root.getChildren().add(scores);
 
