@@ -14,6 +14,8 @@ public class Obstacle {
 	private ImageView top = null;
 	private TranslateTransition transTransition;
 	private TranslateTransition TransTransition;
+	private int a = -1;
+	private int clicks = 0;
 	private double sceneHeight;
 	private double sceneWidth;
 	private boolean bound = true;
@@ -58,7 +60,12 @@ public class Obstacle {
 	}
 	
 	public void random() {
-		this.bottom.setLayoutY(sceneHeight*0.9 - (100 + ((double) Math.random() * 100)));
+		this.bottom.setLayoutY(sceneHeight*0.9 - (100 +  a *((double) Math.random() * 100)));
+		if(clicks % 2 == 0) {
+			a *= -1;
+		}
+		clicks++;
+		System.out.println(bottom.getLayoutY());
 		this.top.setLayoutY(bottom.getLayoutY() - 450);
 
 	}
