@@ -25,6 +25,8 @@ public class Main extends Application {
 	private Group root = null;
 	private ImageView bkgrd = null ;
 	private ImageView flappy = null;
+	private Text text = null;
+	private Group scores;
 	private ImageView clickRun = new ImageView("clickrun.png");
 	private ImageView instruct = new ImageView("instructions.png");
 	private ImageView getReady = new ImageView("getready.png");
@@ -36,7 +38,6 @@ public class Main extends Application {
 	private String url = getClass().getResource("/flappy.png").toString();
 
 	protected static int score = 0;
-	private int i = 0;
 	
 	static double g = 300;
 	static final double boostV = -150;
@@ -70,30 +71,15 @@ public class Main extends Application {
 			protected double curve (double t){
 				checkLocation();
 				
-				Text text = new Text(Integer.toString(score));
+				text = new Text(Integer.toString(score));
 				text.setLayoutX(20);
 				text.setLayoutY(50);
 			    text.setFont(Font.font ("Verdana", 36));
-			    Rectangle rect = new Rectangle();
-			    rect.setLayoutX(20);
-			    rect.setLayoutY(20);
-			    if(score >= 10 && score < 100) {
-			    	rect.setWidth(50);
-			    } else if(score >= 100) {
-			    	rect.setWidth(100);
-			    } else {
-				    rect.setWidth(23);
-			    }
-			    rect.setHeight(35);
-			    rect.fillProperty().set(Color.rgb(128, 185, 200));
-
-				if(i > 0) {
-					root.getChildren().remove(text);
-					root.getChildren().remove(rect);
-					root.getChildren().add(rect);
-				}
-				root.getChildren().add(text);
-				i++;
+			    
+			    root.getChildren().remove(scores);
+			    scores.getChildren().clear();
+			    scores.getChildren().add(text);
+				root.getChildren().add(scores);
 				if (flappy.getY()<=10 && endGame){ //if hits top, go to free fall
 					range=max_y-flappy.getY();
 					v=0;
@@ -165,7 +151,8 @@ public class Main extends Application {
 		instruct.setLayoutY(sceneHeight/2);
 		gameOver.setLayoutX(sceneWidth/5);
 		gameOver.setLayoutY(sceneHeight/5);
-	  
+		text = new Text(Integer.toString(score));
+
 	    
 
 		//TODO 2: add Flappy
@@ -177,8 +164,11 @@ public class Main extends Application {
 
 		//Create a Group 
 		root = new Group( );
+		scores = new Group();
 		root.getChildren().addAll(bkgrd, flappy, clickRun);
 		root.getChildren().addAll(ground.getImageView(), pipe.getImageView1(), pipe.getImageView2());
+		scores.getChildren().add(text);
+		root.getChildren().add(scores);
 
 		//TODO 5: add mouse handler to the scene
 		addMouseEventHandler();
