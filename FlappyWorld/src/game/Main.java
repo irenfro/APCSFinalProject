@@ -15,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -38,6 +40,12 @@ public class Main extends Application {
 	private Ground ground = null;
 	private Obstacle pipe = new Obstacle("/obstacle_bottom.png", "/obstacle_top.png");
 	private String url = getClass().getResource("/flappy.png").toString();
+	private String URL = getClass().getResource("/flap.mp3").toString();
+	private Media m = new Media(URL);
+	private MediaPlayer player = new MediaPlayer(m);
+
+
+
 
 	protected static int score = 0;
 	
@@ -156,6 +164,7 @@ public class Main extends Application {
 						timeline.stop();
 					}
 					if(!endGame){
+						player.play();
 						ground.play();
 						pipe.play();
 						range = max_y-flappy.getY();
@@ -190,7 +199,13 @@ public class Main extends Application {
 		gameOver.setLayoutY(sceneHeight/5);
 		text = new Text(Integer.toString(score));
 
-	    
+	    //Background music
+		String URl = getClass().getResource("/backgroundmusic.mp3").toString();
+		Media m = new Media(URl);
+		MediaPlayer Player = new MediaPlayer(m);
+		Player.setCycleCount(MediaPlayer.INDEFINITE);
+		Player.play();
+
 
 		//TODO 2: add Flappy
 		flappy = new ImageView(url);
