@@ -111,8 +111,8 @@ public class Main extends Application {
 			pipe.stop();
 			root.getChildren().add(gameOver);
 			button = new Button("Restart");
-			button.setLayoutX(20);
-			button.setLayoutY(20);
+			button.setLayoutX(150);
+			button.setLayoutY(150);
 			root.getChildren().add(button);
 			addActionEventHandler();
 	}
