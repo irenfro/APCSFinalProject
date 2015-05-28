@@ -2,6 +2,8 @@ package game;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.Map;
+
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -31,6 +33,9 @@ public class Main extends Application {
 	private Text text = null;
 	private static String[] Args;
 	private Group scores;
+	public Media m;
+	public MediaPlayer Player;
+
 	private ImageView clickRun = new ImageView("clickrun.png");
 	private ImageView instruct = new ImageView("instructions.png");
 	private ImageView getReady = new ImageView("getready.png");
@@ -40,9 +45,7 @@ public class Main extends Application {
 	private Ground ground = null;
 	private Obstacle pipe = new Obstacle("/obstacle_bottom.png", "/obstacle_top.png");
 	private String url = getClass().getResource("/flappy.png").toString();
-	private String URL = getClass().getResource("/flap.mp3").toString();
-	private Media m = new Media(URL);
-	private MediaPlayer player = new MediaPlayer(m);
+	
 
 
 
@@ -69,7 +72,7 @@ public class Main extends Application {
 	private void checkLocation(){
 		double threshold = 8;
 		if(flappy.getY()>=max_y-threshold || flappy.intersects(pipe.getX1(), pipe.getY1(), 52, 320) 
-				|| flappy.intersects(pipe.getX2(), pipe.getY2(), 52, 320) ){ // end game when hits bottom or obstacle
+				|| flappy.intersects(pipe.getX2(), pipe.getY2(), 52, 320)){ // end game when hits bottom or obstacle
 			endGame=true;
 
 		}
@@ -80,7 +83,7 @@ public class Main extends Application {
 			@Override
 			protected double curve (double t){
 				checkLocation();
-				
+
 				text = new Text(Integer.toString(score));
 				text.setLayoutX(20);
 				text.setLayoutY(50);
@@ -176,6 +179,9 @@ public class Main extends Application {
 								timeline.stop();
 							}
 							if(!endGame){
+								String URL = getClass().getResource("/flap.mp3").toString();
+								Media m = new Media(URL);
+								MediaPlayer player = new MediaPlayer(m);
 								player.play();
 								pipe.play();
 								flappyFly(boostV, interpolator);
@@ -208,12 +214,10 @@ public class Main extends Application {
 
 	    //Background music
 		String URl = getClass().getResource("/backgroundmusic.mp3").toString();
-		Media m = new Media(URl);
-		MediaPlayer Player = new MediaPlayer(m);
-		Player.setCycleCount(MediaPlayer.INDEFINITE);
+		m = new Media(URl);
+		Player = new MediaPlayer(m);
 		Player.play();
-
-
+		
 		//TODO 2: add Flappy
 		flappy = new ImageView(url);
 		flappy.preserveRatioProperty().set(true);
