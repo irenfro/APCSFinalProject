@@ -1,3 +1,3 @@
-# APCSFinalProjectTeamB
+# APCSFinalProject
 Flappy Bird project
 
